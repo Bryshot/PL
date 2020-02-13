@@ -3,6 +3,8 @@ import java.io.Reader;
 
 public class AnalizadorLexicoCore {
 
+	private static String NL = System.getProperty("line.separator");
+	
 	enum Estado {
 		INICIO, REC_POR, REC_DIV, REC_PAP, REC_PCIERR, REC_PCOMA, REC_IGUAL,REC_LT,REC_LE,REC_GT, REC_GE,REC_NE,REC_ASIG,REC_EX,
 		REC_MAS, REC_MENOS, REC_NOMBRE, REC_ENT, REC_0,
@@ -87,6 +89,68 @@ public class AnalizadorLexicoCore {
 	private boolean hayMas(){return this.sigCar == '+' ;}
 	private boolean hayMenos(){return this.sigCar == '-' ;}
 	private boolean hayPor(){return this.sigCar == '*' ;}
-	private void transita(Estado newState) {this.estado = newState;}
 	private UnidadLexica error() {return null;}
+	
+	private void transita(Estado sig) throws IOException 
+	{
+		lex.append((char)sigCar);
+		sigCar();
+		estado = sig;
+	}
+
+	private void transitaIgnorando(Estado sig) throws IOException
+	{
+		sigCar();
+		filaInicio = filaActual;
+		columnaInicio = columnaActual;
+		estado = sig;
+	}
+	private void sigCar() throws IOException
+	{
+		sigCar = input.read();
+		// Si es el comienzo del fin de línea,
+		// reconocerlo... Como resultado, sigCar se fijará a '\n'
+		if (sigCar == NL.charAt(0)) saltaFinDeLinea();
+		if (sigCar == '\n') 
+		{
+		filaActual++;
+		columnaActual=0;
+		}
+		else columnaActual++;
+	}
+	
+	private void saltaFinDeLinea() throws IOException
+	{
+		for (int i=1; i < NL.length(); i++) 
+		{
+			sigCar = input.read();
+			if (sigCar != NL.charAt(i)) error();
+		}
+		sigCar = '\n';
+	}
+	private UnidadLexica unidadEnt() 
+	{
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,
+		ClaseLexica.ENT,lex.toString());
+	}
+	
+	private UnidadLexica unidadMas() 
+	{
+		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
+		ClaseLexica.MAS);
+	}
+	
+	private UnidadLexica unidadId() 
+	{
+		switch(lex.toString()) {
+		case "evalua":
+		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
+		ClaseLexica.EVALUA);
+		case "donde":return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
+				ClaseLexica.DONDE);
+		default:
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,
+		ClaseLexica.IDEN,lex.toString());
+		}
+	}
 }
