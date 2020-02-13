@@ -89,7 +89,11 @@ public class AnalizadorLexicoCore {
 	private boolean hayMas(){return this.sigCar == '+' ;}
 	private boolean hayMenos(){return this.sigCar == '-' ;}
 	private boolean hayPor(){return this.sigCar == '*' ;}
-	private UnidadLexica error() {return null;}
+	private void error() 
+	{
+		System.err.println("("+filaActual+','+columnaActual+ "):Caracter inexperado");
+		System.exit(1);
+	}
 	
 	private void transita(Estado sig) throws IOException 
 	{
