@@ -73,6 +73,7 @@ public class AnalizadorLexicoCore {
 	private boolean hayLetra() {return this.sigCar >= 'a' && this.sigCar <= 'z' || this.sigCar >= 'A' && this.sigCar <= 'z';}
 	private boolean hayCero(){return this.sigCar == '0' ;}
 	private boolean hayDigitoPos(){return this.sigCar >= '1'&& this.sigCar <= '9' ;}
+	private boolean hayDigito(){return this.hayDigitoPos() || this.hayCero() ;}
 	private boolean hayPunto(){return this.sigCar == '.' ;}
 	private boolean haySeparador(){return this.sigCar == '&' ;}
 	private boolean hayPComa(){return this.sigCar == ';' ;}
