@@ -6,9 +6,9 @@ public class AnalizadorLexicoCore {
 	private static String NL = System.getProperty("line.separator");
 	
 	enum Estado {
-		INICIO, REC_POR, REC_DIV, REC_PAP, REC_PCIERR, REC_PCOMA, REC_IGUAL,REC_LT,REC_LE,REC_GT, REC_GE,REC_NE,REC_ASIG,REC_EX,
-		REC_MAS, REC_MENOS, REC_NOMBRE, REC_ENT, REC_0,
-		}// REC_IDEC, REC_DEC,REC_COM,REC_EOF,
+		INICIO,REC_MAS,REC_MENOS, REC_POR, REC_DIV,INT_EX,REC_NE,REC_GT, REC_GE,REC_LT,REC_LE,REC_PCIERRE, REC_PAP, 
+		REC_NOMBRE,INT_SEP,REC_SEP, REC_PCOMA, REC_ENT, REC_0, REC_ASIG,REC_IGUAL,REC_EOF
+		}// REC_IDEC, REC_DEC,REC_COM,
 	
 	private Reader input; // flujo de entrada
 	private StringBuffer lex; // cadena para almacenar el lexema de la u. léxica
@@ -41,19 +41,71 @@ public class AnalizadorLexicoCore {
 			switch(estado)
 			{
 			case INICIO:
-				if(hayLetra()) transita(Estado.REC_ID);
+				if(hayLetra()) transita(Estado.REC_NOMBRE);
 				else if (hayDigitoPos()) transita(Estado.REC_ENT);
 				else if (hayCero()) transita(Estado.REC_0);
-				else if (haySuma()) transita(Estado.REC_MAS);
-				else if (hayAlmohadilla()) transitaIgnorando(Estado.REC_COM);
-				else if (haySep()) transitaIgnorando(Estado.INICIO);
+				else if (hayMas()) transita(Estado.REC_MAS);
+				else if (hayMenos()) transita(Estado.REC_MENOS);
+				else if (haySeparador()) transita(Estado.INT_SEP);
+				else if (hayPComa()) transita(Estado.REC_PCOMA);
+				else if (hayPApertura())transita(Estado.REC_PAP);
+				else if (hayPCierre())transita(Estado.REC_PCIERRE);
+				else if (hayMenor())transita(Estado.REC_LT);
+				else if (hayMayor())transita(Estado.REC_GT);
+				else if (hayEx())transita(Estado.INT_EX);
+				else if (hayDiv())transita(Estado.REC_DIV);
+				else if (hayPor())transita(Estado.REC_POR);
+				else if (hayIgual())transita(Estado.REC_ASIG);
 				else if (hayEOF()) transita(Estado.REC_EOF);
 				else error();
 				break;
-			case REC_ID:
-				if (hayLetra() || hayDigito()) transita(Estado.REC_ID);
+			case REC_NOMBRE:
+				if (hayLetra() || hayDigito()) transita(Estado.REC_NOMBRE);
 				else return unidadId();
 				break;
+			case REC_PCOMA:
+				return unidadPComa();
+				break;
+			case INT_SEP:
+				if(haySeparador())transita(Estado.REC_SEP);
+				break;
+			case REC_PAP:
+				return unidadPAP();
+				break;
+			case REC_PCIERRE:
+				return unidadPCierre();
+				break;
+			case REC_LT:
+				if(hayIgual())transita(Estado.REC_LE);
+				else return unidadLT();
+				break;
+			case REC_LE:
+				return unidadLE();
+				break;
+			case REC_GT:
+				if(hayIgual())transita(Estado.REC_GE);
+				else return unidadGT();
+				break;
+			case REC_GE:
+				return unidadGE(); 
+				break;
+			case INT_EX:
+				if(hayIgual())transita(Estado.REC_NE);
+				break;
+			case REC_DIV:
+				return unidadDIV();
+				break;
+			case REC_POR:
+				return unidadPor();
+				break;
+			case REC_ASIG:
+				if(hayIgual())transita(Estado.REC_IGUAL);
+				else return unidadAsignacion();
+				break;
+			case REC_IGUAL:
+				return unidadIgual();
+				break;
+				
 			case REC_ENT:
 				if (hayDigito()) transita(Estado.REC_ENT);
 				else if (hayPunto()) transita(Estado.REC_IDEC);
@@ -63,15 +115,30 @@ public class AnalizadorLexicoCore {
 				if (hayPunto()) transita(Estado.REC_IDEC);
 				else return unidadEnt();
 				break;
+				
 			case REC_MAS:
 				if (hayDigitoPos()) transita(Estado.REC_ENT);
 				else if(hayCero()) transita(Estado.REC_0);
 				else return unidadMas();
 				break;
-			case REC_POR: return unidadPor();
+			case REC_EOF:
+				break;
+			case REC_MENOS:
+				break;
+			case REC_NE:
+				return unidadNEQ();
+				break;
+			case REC_SEP:
+				return unidadSeparador();
+				break;
 			}
 		}
 	}
+	private boolean hayEOF() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	private boolean hayLetra() {return this.sigCar >= 'a' && this.sigCar <= 'z' || this.sigCar >= 'A' && this.sigCar <= 'z';}
 	private boolean hayCero(){return this.sigCar == '0' ;}
 	private boolean hayDigitoPos(){return this.sigCar >= '1'&& this.sigCar <= '9' ;}
@@ -109,6 +176,7 @@ public class AnalizadorLexicoCore {
 		columnaInicio = columnaActual;
 		estado = sig;
 	}
+	
 	private void sigCar() throws IOException
 	{
 		sigCar = input.read();
@@ -117,8 +185,8 @@ public class AnalizadorLexicoCore {
 		if (sigCar == NL.charAt(0)) saltaFinDeLinea();
 		if (sigCar == '\n') 
 		{
-		filaActual++;
-		columnaActual=0;
+			filaActual++;
+			columnaActual=0;
 		}
 		else columnaActual++;
 	}
@@ -132,29 +200,37 @@ public class AnalizadorLexicoCore {
 		}
 		sigCar = '\n';
 	}
+	
 	private UnidadLexica unidadEnt() 
 	{
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,
-		ClaseLexica.ENT,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ENT,lex.toString());
 	}
-	
-	private UnidadLexica unidadMas() 
-	{
-		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
-		ClaseLexica.MAS);
-	}
-	
+	private UnidadLexica unidadPComa() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PCOMA);}
+	private UnidadLexica unidadMas() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.MAS);}
+	private UnidadLexica unidadPor() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,	ClaseLexica.POR);}
+	private UnidadLexica unidadPAP() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PAP);}
+	private UnidadLexica unidadPCierre() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PCIERRE);}
+	private UnidadLexica unidadIgual() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.IGUAL);}
+	private UnidadLexica unidadSeparador() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.SEPARADOR);}
+	private UnidadLexica unidadLT() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.LT);}
+	private UnidadLexica unidadLE() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.LE);}
+	private UnidadLexica unidadGT() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.GT);}
+	private UnidadLexica unidadGE() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.GE);}
+	private UnidadLexica unidadEQ() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.EQ);}
+	private UnidadLexica unidadNEQ() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.NEQ);}
+	private UnidadLexica unidadMenos() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.MENOS);}
+	private UnidadLexica unidadDIV() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.DIV);}
+	private UnidadLexica unidadAsignacion() {return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.ASIGNACION);}
 	private UnidadLexica unidadId() 
 	{
-		switch(lex.toString()) {
-		case "evalua":
-		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
-		ClaseLexica.EVALUA);
-		case "donde":return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,
-				ClaseLexica.DONDE);
-		default:
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,
-		ClaseLexica.IDEN,lex.toString());
+		switch(lex.toString())
+		{
+			case "OR":		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.OR);
+			case "AND":		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.AND);
+			case "NOT":		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.NOT);
+			case "TRUE":		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.TRUE);
+			case "FALSE":		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.FALSE);
+			default:return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.IDEN,lex.toString());
 		}
 	}
 }
