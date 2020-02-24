@@ -1,0 +1,9 @@
+bool binario;
+real altura;
+real peso;
+int edad
+&& 
+altura = (72.82 * (-7.32))/83;
+peso = altura *2e3;
+binario= & (true != false and true) or (not true);
+edad = 14;
