@@ -1,3 +1,4 @@
+package AnalizadorLexico;
 public abstract class UnidadLexica 
 {
 	private ClaseLexica clase;

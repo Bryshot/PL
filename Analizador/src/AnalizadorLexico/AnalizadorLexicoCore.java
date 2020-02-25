@@ -1,3 +1,4 @@
+package AnalizadorLexico;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -168,13 +169,13 @@ public class AnalizadorLexicoCore {
 		estado = sig;
 	}
 
-	private void transitaIgnorando(Estado sig) throws IOException
+	/*private void transitaIgnorando(Estado sig) throws IOException
 	{
 		sigCar();
 		filaInicio = filaActual;
 		columnaInicio = columnaActual;
 		estado = sig;
-	}
+	}*/
 	
 	private void sigCar() throws IOException
 	{

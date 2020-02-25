@@ -1,3 +1,4 @@
+package AnalizadorLexico;
 public enum ClaseLexica 
 {
 	IDEN, ENT, REAL, PAP, PCIERRE, IGUAL, PCOMA,SEPARADOR,AND,OR,NOT,LT,LE,GE,GT,NEQ,
