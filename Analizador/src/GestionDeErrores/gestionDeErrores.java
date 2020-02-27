@@ -4,7 +4,7 @@ import AnalizadorLexico.ClaseLexica;
 
 public class gestionDeErrores {
 
-   public void errorLexico(int fila, String lexema) {
+   public void errorLexico(int fila, int columna, String lexema) {
      System.out.println("ERROR fila "+fila+": Caracter inexperado: "+lexema); 
      System.exit(1);
    }  

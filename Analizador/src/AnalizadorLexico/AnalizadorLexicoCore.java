@@ -2,6 +2,8 @@ package AnalizadorLexico;
 import java.io.IOException;
 import java.io.Reader;
 
+import GestionDeErrores.gestionDeErrores;
+
 public class AnalizadorLexicoCore {
 
 	private static String NL = System.getProperty("line.separator");
@@ -19,10 +21,12 @@ public class AnalizadorLexicoCore {
 	private int filaActual;
 	private int columnaActual;
 	private Estado estado; // estado del autómata
-
+	private gestionDeErrores errores;
+	
 	public AnalizadorLexicoCore(Reader input) throws IOException 
 	{
 		this.input = input;
+		this.errores = new gestionDeErrores();
 		lex = new StringBuffer();
 		sigCar = input.read();
 		filaActual=1;
@@ -158,8 +162,7 @@ public class AnalizadorLexicoCore {
 	private boolean hayPor(){return this.sigCar == '*' ;}
 	private void error() 
 	{
-		System.err.println("("+filaActual+','+columnaActual+ "):Caracter inexperado");
-		System.exit(1);
+		this.errores.errorLexico(this.filaActual, this.columnaActual, this.lex.toString());
 	}
 	
 	private void transita(Estado sig) throws IOException 
