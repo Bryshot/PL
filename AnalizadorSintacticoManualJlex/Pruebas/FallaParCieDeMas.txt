@@ -1,0 +1,6 @@
+bool enc;
+bool test
+&&
+enc = (((82 >= 82.1) and (7 == 2)) or (14 <20)));
+test = ((7<= 14) and not(13 > 11.72))
+

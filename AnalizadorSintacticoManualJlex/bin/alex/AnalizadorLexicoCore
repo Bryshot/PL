@@ -1,0 +1,85 @@
+package alex;
+
+%%
+%line
+%class AnalizadorLexicoCore
+%type  UnidadLexica
+%unicode
+
+%{
+  private ALexOperations ops;
+  public String lexema() {return yytext();}
+  public int fila() {return yyline+1;}
+%}
+
+%eofval{
+  return ops.unidadEof();
+%eofval}
+
+%init{
+  ops = new ALexOperations(this);
+%init}
+
+letra = ([a-z]|[A-Z])
+noCero = [1-9]
+cero = 0
+cifra = ({cero}|{noCero})
+parteEnt = ({cero}|({noCero}{cifra}*))
+mas = \+
+menos = \-
+numEnt = ({mas}|{menos})?{parteEnt}
+partePunto = \.{cifra}*{noCero}
+parteExp = [e,E]({mas}|{menos})?{parteEnt}
+parteAmbas = {partePunto}{parteExp}
+numReal = ({mas}|{menos})?{parteEnt}({partePunto}|{parteExp}|{parteAmbas})
+nombreVariable = {letra}({cifra}|{letra}|\_)*
+parAper = \(
+parCie = \)
+eq = \=\=
+lt = \<
+gt = \>
+ge = \>\=
+le = \<\=
+ne = \!\=
+puntoComa = \;
+separador = \&\&
+and = and
+or = or
+not = not
+div = \/
+por = \*
+asig = \=
+true = true
+false = false
+tEnt = int
+tReal = real
+tBool = bool
+ignorable = [ \t\r\b\n]
+%% 
+{numEnt}			{return ops.unidadEnt();}	
+{numReal}			{return ops.unidadReal();} 
+{tEnt}				{return ops.unidadTEnt();} 
+{tReal}				{return ops.unidadTReal();} 
+{tBool}				{return ops.unidadTBool();} 
+{true}				{return ops.unidadTrue();} 
+{false}				{return ops.unidadFalse();} 
+{and}				{return ops.unidadAnd();} 
+{or}				{return ops.unidadOr();} 
+{not}				{return ops.unidadNot();}
+{nombreVariable}	{return ops.unidadId();}
+{ignorable}			{}
+{puntoComa}			{return ops.unidadPComa();}
+{mas}				{return ops.unidadMas();} 
+{por}				{return ops.unidadPor();}
+{parAper}			{return ops.unidadPAper();}
+{parCie}			{return ops.unidadPCie();} 
+{eq}				{return ops.unidadIgual();} 
+{separador}			{return ops.unidadSeparador();}
+{lt}				{return ops.unidadLT();}
+{le}				{return ops.unidadLE();} 
+{gt}				{return ops.unidadGT();}
+{ge}				{return ops.unidadGE();}
+{ne}				{return ops.unidadNEQ();}
+{menos}				{return ops.unidadMenos();} 
+{div}				{return ops.unidadDIV();} 
+{asig}				{return ops.unidadAsignacion();}
