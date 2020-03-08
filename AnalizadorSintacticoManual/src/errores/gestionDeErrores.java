@@ -1,0 +1,27 @@
+package errores;
+
+import alex.ClaseLexica;
+
+public class gestionDeErrores {
+
+   public void errorLexico(int fila, int columna, String lexema) {
+     System.out.println("ERROR fila "+fila+": Caracter inexperado: "+lexema); 
+     System.exit(1);
+   }  
+
+   public void errorSintactico(int fila, ClaseLexica encontrada, ClaseLexica[] esperadas)
+   {
+     System.out.print("ERROR fila "+fila+": Encontrado "+encontrada+" Se esperada: ");
+     for(ClaseLexica esperada: esperadas)
+         System.out.print(esperada+" ");
+     System.out.println();
+     System.exit(1);
+   }
+   
+   public void errorFatal(Exception e) {
+     System.out.println(e);
+     e.printStackTrace();
+     System.exit(1);
+   }
+}
+

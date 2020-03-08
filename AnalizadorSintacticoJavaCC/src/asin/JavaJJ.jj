@@ -1,0 +1,70 @@
+options  {
+  STATIC=false;
+}  
+PARSER_BEGIN(AnalizadorSintactico)
+package asin;
+
+public class AnalizadorSintactico {}
+PARSER_END(AnalizadorSintactico)
+  TOKEN:{<#Letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#NoCero:["1"-"9"]>}
+  TOKEN:{<#Cero:"0">} 
+  TOKEN:{<#Cifra:<NoCero>|<Cero>>}
+  TOKEN:{<#Punto:".">}
+  TOKEN:{<#CaracterValido: <Cifra> | <Letra> | "_">}
+  TOKEN:{<#ParteReal:<PartePunto> | <ParteExp> | <ParteAmbas>>}
+  TOKEN:{<#ParteAmbas:<PartePunto> <ParteExp>>}
+  TOKEN:{<#PartePunto:<Punto> (<Cifra>)* <NoCero> >}
+  TOKEN:{<#ParteExp:["e", "E"] <NumEnt> >}
+  SKIP:{<["\t"," ","\r","\b","\n"]>}
+  TOKEN: {<TEnt:"int">}
+  TOKEN: {<TReal:"real">}
+  TOKEN: {<TBool:"bool">}
+  TOKEN: {<And:"and">}
+  TOKEN: {<Not:"not">}
+  TOKEN: {<Or:"or">}
+  TOKEN: {<True:"true">}
+  TOKEN: {<False:"false">}
+  TOKEN: {<PAper:"(">}
+  TOKEN: {<PCie:")">}
+  TOKEN: {<EQ:"==">}
+  TOKEN: {<LT:"<">}
+  TOKEN: {<GT:">">}
+  TOKEN: {<GE:">=">}
+  TOKEN: {<LE:"<=">}
+  TOKEN: {<NE:"!=">}
+  TOKEN: {<PComa:";">}
+  TOKEN: {<Separador:"&&">}
+  TOKEN: {<Mas:"+">}
+  TOKEN: {<Menos:"-">}
+  TOKEN: {<Div:"/">}
+  TOKEN: {<Por:"*">}
+  TOKEN: {<Asig:"=">}
+  TOKEN:{<NombreVariable:<Letra>(<CaracterValido>)*>}
+  TOKEN:{<NumEnt: (<Mas> | <Menos>)? (<Cero> | (<NoCero> (<Cifra>)*)) >}
+  TOKEN:{<NumReal:<NumEnt><ParteReal>>}
+  
+  void Sp()   : {} {Prog() <EOF>}
+  void Prog() : {} {SeccionDec() <Separador> SeccionInst()}
+  void SeccionDec()   : {} {Decs()}
+  void Decs()   : {} {Dec() ReDecs()}
+  void ReDecs()   : {} {<PComa> Dec() ReDecs() | {}}
+  void Dec()   : {} {NombreTipo() <NombreVariable>}
+  void NombreTipo()   : {} {<TEnt> | <TReal> | <TBool>}
+  void SeccionInst()   : {} {Insts()}
+  void Insts()   : {} {Inst() ReInsts()}
+  void ReInsts()   : {} {<PComa> Inst() ReInsts() | {}}
+  void Inst()   : {} {<NombreVariable> <Asig> E0()}
+  void E0()   : {} {E1() RE0()}
+  void RE0()   : {} {<Mas> E0() | <Menos> E1() | {}}
+  void E1()   : {} {E2() RE1()}
+  void RE1()   : {} {OP1() E2() RE1() | {}}
+  void E2()   : {} {E3() RE2()}
+  void RE2()   : {} {OP2() E3() RE2() | {}}
+  void E3()   : {} {E4() RE3()}
+  void RE3()   : {} {OP3() E4() | {}}
+  void E4()   : {} {<Menos> E5() | <Not> E4() | E5()}
+  void E5()   : {} {<PAper> E0() <PCie> | <NombreVariable> | <True> | <False> | <NumEnt> | <NumReal>}
+  void OP1()   : {} {<And> | <Or>}
+  void OP2()   : {} {<EQ> | <NE>| <GT>| <GE>| <LT>| <LE>}
+  void OP3()   : {} {<Por> | <Div>}
