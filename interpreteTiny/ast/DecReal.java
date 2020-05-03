@@ -10,6 +10,6 @@ public class DecReal extends Dec {
     public TipoDec tipo() {return TipoDec.REAL;} 
     public String toString()
     {
-      return "("+ "Real "+this.var.toString()+")";
+      return "{"+ "Real "+this.var.toString()+"}";
     }
 }

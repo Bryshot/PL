@@ -7,6 +7,6 @@ public class Lt extends EBin {
     public TipoE tipo() {return TipoE.LT;}
     public String toString()
     {
-      return "("+this.opnd1().toString() +" < "+this.opnd2().toString()+")";
+      return "{"+this.opnd1().toString() +" Lt "+this.opnd2().toString()+"}";
     }
  }

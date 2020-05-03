@@ -11,7 +11,7 @@ public class DecInt  extends Dec {
     
     public String toString()
     {
-      return "("+ "Int "+this.var.toString()+")";
+      return "{"+ "Int "+this.var.toString()+"}";
     }
  }
  

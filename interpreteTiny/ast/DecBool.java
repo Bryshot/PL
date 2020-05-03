@@ -11,6 +11,6 @@ public class DecBool  extends Dec {
 
     public String toString()
     {
-      return "("+ "Bool "+this.var.toString()+")";
+      return "{"+ "Bool "+this.var.toString()+"}";
     }
  }

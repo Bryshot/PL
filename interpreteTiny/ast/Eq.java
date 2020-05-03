@@ -8,6 +8,6 @@ public class Eq extends EBin {
 
     public String toString()
     {
-      return "("+this.opnd1().toString() +" == "+this.opnd2().toString()+")";
+      return "{"+this.opnd1().toString() +" EQ "+this.opnd2().toString()+"}";
     }
  }

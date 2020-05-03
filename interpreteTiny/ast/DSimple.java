@@ -11,6 +11,6 @@ public class DSimple extends LDs {
 
    public String toString()
    {
-     return "("+this.dec.toString()+")";
+     return "{"+this.dec.toString()+"}";
    }
 }

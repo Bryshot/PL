@@ -7,6 +7,6 @@ public class Ge extends EBin {
     public TipoE tipo() {return TipoE.GE;}
     public String toString()
     {
-      return "("+this.opnd1().toString() +" >= "+this.opnd2().toString()+")";
+      return "{"+this.opnd1().toString() +" GE "+this.opnd2().toString()+"}";
     }
  }
