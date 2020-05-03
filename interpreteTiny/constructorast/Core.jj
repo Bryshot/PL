@@ -79,7 +79,7 @@ PARSER_END(ConstructorASTCore)
 
   Dec D()    : {Token id;Token t;} {id=<Real> t=<identificador>{return as.decReal(t.image);}|
                             id=<Int>  t=<identificador>{return as.decInt(t.image);}|
-                            id=<Boolean>  t=<identificador>{return  as.decBool(t.image);}}
+                            id=<Bool>  t=<identificador>{return  as.decBool(t.image);}}
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
@@ -105,7 +105,7 @@ PARSER_END(ConstructorASTCore)
                                 {return ahOfRE3;} }
 
   E E4()   : {E aOfE5;}{"-" aOfE5 = E5(){return as.negacion(aOfE5);}|
-                        "Not" aOfE5 = E5(){return as.not(aOfE5);}|
+                        "Not" aOfE5 = E4(){return as.not(aOfE5);}|
                         {return E5();}}
                                 
   E E5()   : {Token t; E aOfE0;} 
