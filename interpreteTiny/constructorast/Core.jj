@@ -68,7 +68,7 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLIs1;}| 
                                   {return ahOfRLIs0;} }
  
-  Inst I()    : {Token id;E aOfE0} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
+  Inst I()    : {Token id;E aOfE0;} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
 
   LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.dSimple(d)) 
                        {return aOfRLDs;}}
@@ -77,14 +77,14 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
-  Dec D()    : {Token id;E aOfE0} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}|
-                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);}|
-                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}}
+  Dec D()    : {Token id;E aOfE0;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0.image);}|
+                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0.image);}|
+                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0.image);}}
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
   E RE0(E ahOfRE0)  : {E aOfE0;} 
-                            {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0)}| 
+                            {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0);}| 
                              "-" aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
 

@@ -74,7 +74,7 @@ public class ConstructorASTCore implements ConstructorASTCoreConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public Inst I() throws ParseException {Token id;
+  final public Inst I() throws ParseException {Token id;E aOfE0;
     id = jj_consume_token(identificador);
     jj_consume_token(17);
     aOfE0 = E0();
@@ -84,7 +84,7 @@ public class ConstructorASTCore implements ConstructorASTCoreConstants {
 
   final public LDs LDec() throws ParseException {Dec d; LDs aOfRLDs;
     d = D();
-    aOfRLDs = RLDs(as.cSimple(d));
+    aOfRLDs = RLDs(as.dSimple(d));
 {if ("" != null) return aOfRLDs;}
     throw new Error("Missing return statement in function");
   }
@@ -94,7 +94,7 @@ public class ConstructorASTCore implements ConstructorASTCoreConstants {
     case 16:{
       jj_consume_token(16);
       d = D();
-      aOfRLDs1 = RLDs(as.cCompuesta(ahOfRLDs0,d));
+      aOfRLDs1 = RLDs(as.dCompuesta(ahOfRLDs0,d));
 {if ("" != null) return aOfRLDs1;}
       break;
       }
