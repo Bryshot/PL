@@ -8,5 +8,10 @@ public class DecInt  extends Dec {
     
     public String var() {return var;}
     public TipoDec tipo() {return TipoDec.INT;} 
+    
+    public String toString()
+    {
+      return "("+ "Int "+this.var.toString()+")";
+    }
  }
  

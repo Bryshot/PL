@@ -11,18 +11,17 @@ public class Eval {
   public Eval() {
     binds = new HashMap<String,Double>();  
   }
-  public double eval(S s) {
+  public double eval(Prog s) {
    binds(s);
-   return eval(s.exp());    
+   return eval(s.insts());    
   }  
-  private void binds(S s) {
+  private void binds(Prog s) {
      binds.clear();   
-     if (s.tipo() == TipoS.EVALUADONDE) 
-        mkBinds(s.decs());
+     mkBinds(s.decs());
   }
   private void mkBinds(LDs decs) {
      if (decs.tipo() == TipoLDs.DCOMPUESTA) mkBinds(decs.decs());
-     binds.put(decs.id(),eval(decs.exp()));
+     binds.put(decs.dec().var(),0.0);
   }
  
   private double valorDe(String id) {
@@ -35,17 +34,30 @@ public class Eval {
   } 
   private double eval(E exp) {
      switch(exp.tipo()) {
-         case REAL: return Double.valueOf(exp.val()).doubleValue();
-         case ENTERO: return Integer.valueOf(exp.val()).intValue();
-         case ID: return valorDe(exp.id());    
+        // case REAL: return Double.valueOf(exp.val()).doubleValue();
+        // case ENTERO: return Integer.valueOf(exp.val()).intValue();
+        // case ID: return valorDe(exp.id()); 
+         case TrueFalse: return eval(exp.opnd1())/eval(exp.opnd2());   
+         case VAR: return valorDe(exp.var());
+         case NUM: return Double.valueOf(exp.num()).intValue();
          case SUMA: return eval(exp.opnd1())+eval(exp.opnd2());    
          case RESTA: return eval(exp.opnd1())-eval(exp.opnd2());    
          case MUL: return eval(exp.opnd1())*eval(exp.opnd2());    
          case DIV: return eval(exp.opnd1())/eval(exp.opnd2());    
+         case AND: return eval(exp.opnd1())/eval(exp.opnd2());    
+         case OR: return eval(exp.opnd1())-eval(exp.opnd2());    
+         case GE: return eval(exp.opnd1())*eval(exp.opnd2());    
+         case GT: return eval(exp.opnd1())/eval(exp.opnd2());     
+         case LE: return eval(exp.opnd1())+eval(exp.opnd2());    
+         case LT: return eval(exp.opnd1())-eval(exp.opnd2());    
+         case EQ: return eval(exp.opnd1())*eval(exp.opnd2());    
+         case NE: return eval(exp.opnd1())/eval(exp.opnd2()); 
+         case NEG: return eval(exp.opnd1())/eval(exp.opnd2());
          default: return -1;    
      } 
   }
   
+
   public static void main(String[] args) throws Exception {
     ConstructorASTTiny cast = new ConstructorASTTiny(new FileReader(args[0]));
     Eval eval = new Eval();

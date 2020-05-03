@@ -11,5 +11,10 @@ public class Asig  extends Inst {
     public String var() {return var;}
     public E exp() {return exp;}
     public TipoInst tipo() {return TipoInst.ASIG;} 
+
+    public String toString()
+    {
+      return "("+this.var.toString()+ " = "+ this.exp.toString()+")";
+    }
  }
  

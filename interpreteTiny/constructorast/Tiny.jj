@@ -13,12 +13,28 @@ public class ConstructorASTTiny {
    private final static int MENOS=1;
    private final static int POR=2;
    private final static int DIV=3;
+   private final static int AND=4;
+   private final static int OR=5;
+   private final static int EQ=6;
+   private final static int NE=7;
+   private final static int GT=8;
+   private final static int GE=9;
+   private final static int LT=10;
+   private final static int LE=11;
    private E mkexp(int op, E opnd1, E opnd2){
      switch(op) {
       case MAS: return as.suma(opnd1,opnd2);
       case MENOS: return as.resta(opnd1,opnd2);
       case POR: return as.mul(opnd1,opnd2);
       case DIV: return as.div(opnd1,opnd2);
+      case AND: return as.and(opnd1,opnd2);
+      case OR: return as.or(opnd1,opnd2);
+      case EQ: return as.eq(opnd1,opnd2);
+      case NE: return as.ne(opnd1,opnd2);
+      case GT: return as.gt(opnd1,opnd2);
+      case GE: return as.ge(opnd1,opnd2);
+      case LT: return as.lt(opnd1,opnd2);
+      case LE: return as.le(opnd1,opnd2);
       default: return null;
      }
    }

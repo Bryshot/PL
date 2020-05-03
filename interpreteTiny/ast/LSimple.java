@@ -9,5 +9,10 @@ public class LSimple  extends LIs {
     
     public Inst inst() {return inst;}
     public TipoLIs tipo() {return TipoLIs.LSIMPLE;} 
+
+    public String toString()
+    {
+      return "("+this.inst.toString()+")";
+    }
  }
  

@@ -5,4 +5,8 @@ public class Neg extends E {
    public Neg(E exp) {this.exp = exp;}
    public E exp() {return exp;}
    public TipoE tipo(){return TipoE.NEG;} 
+   public String toString()
+   {
+     return "("+"!"+this.opnd1().toString() +")";
+   }
 }

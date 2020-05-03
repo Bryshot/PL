@@ -8,4 +8,9 @@ public class DSimple extends LDs {
    
    public Dec dec() {return dec;}
    public TipoLDs tipo() {return TipoLDs.DSIMPLE;} 
+
+   public String toString()
+   {
+     return "("+this.dec.toString()+")";
+   }
 }

@@ -5,4 +5,9 @@ public class Or extends EBin {
       super(opnd1,opnd2);  
     }     
     public TipoE tipo() {return TipoE.OR;}
+
+    public String toString()
+    {
+      return "("+this.opnd1().toString() +" Or "+this.opnd2().toString()+")";
+    }
  }

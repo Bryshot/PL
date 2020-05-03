@@ -7,4 +7,8 @@ public class TrueFalse extends E{
     }
     public String trueFalse() {return trueFalse;}
     public TipoE tipo() {return TipoE.TrueFalse;}    
+    public String toString()
+    {
+      return "("+this.trueFalse.toString() +")";
+    }
 }

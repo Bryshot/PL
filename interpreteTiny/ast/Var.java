@@ -6,5 +6,9 @@ public class Var extends E {
      this.var = var;   
     }
     public String var() {return var;}
-    public TipoE tipo() {return TipoE.VAR;}    
+    public TipoE tipo() {return TipoE.VAR;}     
+    public String toString()
+    {
+      return "("+this.var.toString() +")";
+    }
   }

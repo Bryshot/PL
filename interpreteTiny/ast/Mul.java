@@ -5,4 +5,8 @@ public class Mul extends EBin {
      super(opnd1,opnd2);  
    }     
    public TipoE tipo() {return TipoE.MUL;}
+   public String toString()
+   {
+     return "("+this.opnd1().toString() +" * "+this.opnd2().toString()+")";
+   }
 }

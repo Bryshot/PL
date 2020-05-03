@@ -12,4 +12,8 @@ public class LCompuesta extends LIs{
     public LIs lInst() {return lInst;}
     public Inst inst() {return inst;}
     public TipoLIs tipo() {return TipoLIs.LCOMPUESTA;} 
+    public String toString()
+    {
+      return "("+this.inst.toString() +", "+this.lInst().toString()+")";
+    }
 }

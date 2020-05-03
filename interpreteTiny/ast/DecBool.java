@@ -8,4 +8,9 @@ public class DecBool  extends Dec {
     
     public String var() {return var;}
     public TipoDec tipo() {return TipoDec.BOOL;} 
+
+    public String toString()
+    {
+      return "("+ "Bool "+this.var.toString()+")";
+    }
  }

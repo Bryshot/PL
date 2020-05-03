@@ -7,4 +7,8 @@ public class Num extends E {
     }
     public String num() {return num;}
     public TipoE tipo() {return TipoE.NUM;}    
+    public String toString()
+    {
+      return "("+this.num.toString()+")";
+    }
   }
