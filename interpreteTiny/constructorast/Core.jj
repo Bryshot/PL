@@ -47,12 +47,12 @@ PARSER_END(ConstructorASTCore)
   SKIP:{<["\t"," ","\r","\b","\n"]>}  
   SKIP:{<"#"(~["\n"])*>}  
   TOKEN: {<trueFalse:"true"|"false">}
-  TOKEN: {<Boolean:"Boolean">}
-  TOKEN: {<Int:"Int">}
+  TOKEN: {<bool:"bool">}
+  TOKEN: {<int:"int">}
   TOKEN: {<And:"And">}
   TOKEN: {<Or:"Or">}
   TOKEN: {<Not:"Not">}
-  TOKEN: {<Real:"Real">}
+  TOKEN: {<real:"real">}
   TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
   TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
   TOKEN:{<numeroReal: (["+","-"])? <parteEntera> "." <parteDecimal> >  }
