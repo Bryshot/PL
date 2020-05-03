@@ -9,6 +9,6 @@ public class TrueFalse extends E{
     public TipoE tipo() {return TipoE.TrueFalse;}    
     public String toString()
     {
-      return "{"+this.trueFalse.toString() +"}";
+      return "("+this.trueFalse.toString() +")";
     }
 }

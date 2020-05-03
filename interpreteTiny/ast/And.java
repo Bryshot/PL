@@ -9,6 +9,6 @@ public class And extends EBin {
 
     public String toString()
     {
-      return "{"+this.opnd1().toString() +" And "+this.opnd2().toString()+"}";
+      return "("+this.opnd1().toString() +" And "+this.opnd2().toString()+")";
     }
  }

@@ -1,0 +1,117 @@
+options  {
+  STATIC=false;
+}  
+PARSER_BEGIN(ConstructorASTCore)
+package constructorast;
+
+import ast.*;
+
+public class ConstructorASTCore {
+   private ASCore as = new ASCore();
+   private final static int MAS=0;
+   private final static int MENOS=1;
+   private final static int POR=2;
+   private final static int DIV=3;
+   private final static int AND=4;
+   private final static int OR=5;
+   private final static int EQ=6;
+   private final static int NE=7;
+   private final static int GT=8;
+   private final static int GE=9;
+   private final static int LT=10;
+   private final static int LE=11;
+   private E mkexp(int op, E opnd1, E opnd2){
+     switch(op) {
+      case MAS: return as.suma(opnd1,opnd2);
+      case MENOS: return as.resta(opnd1,opnd2);
+      case POR: return as.mul(opnd1,opnd2);
+      case DIV: return as.div(opnd1,opnd2);
+      case AND: return as.and(opnd1,opnd2);
+      case OR: return as.or(opnd1,opnd2);
+      case EQ: return as.eq(opnd1,opnd2);
+      case NE: return as.ne(opnd1,opnd2);
+      case GT: return as.gt(opnd1,opnd2);
+      case GE: return as.ge(opnd1,opnd2);
+      case LT: return as.lt(opnd1,opnd2);
+      case LE: return as.le(opnd1,opnd2);
+      default: return null;
+     }
+   }
+}
+PARSER_END(ConstructorASTCore)
+  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#digitoPositivo:["1"-"9"]>}
+  TOKEN:{<#digito:<digitoPositivo>|"0">} 
+  TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
+  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo>>}
+  SKIP:{<["\t"," ","\r","\b","\n"]>}  
+  SKIP:{<"#"(~["\n"])*>}  
+  TOKEN: {<trueFalse:"true"|"false">}
+  TOKEN: {<Boolean:"Boolean">}
+  TOKEN: {<Int:"Int">}
+  TOKEN: {<Real:"Real">}
+  TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
+  TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
+  TOKEN:{<numeroReal: (["+","-"])? <parteEntera> "." <parteDecimal> >  }
+  
+  Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
+
+  Prog Programa() : {LDs aOfLDs,LIs aOfLIs} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs)}}
+ 
+  LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.LSimple(d)) 
+                       {return aOfRLIs;}}
+  LIs RLIs(LIs ahOfRLIs0) : {Inst d; LIs aOfRLIs1;} 
+                                {";" d=I() aOfRLIs1=RLIs(as.LCompuesta(ahOfRLIs0,d)) 
+                                  {return aOfRLIs1;}| 
+                                  {return ahOfRLIs0;} }
+ 
+  Inst I()    : {Token id;} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
+
+  LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.cSimple(d)) 
+                       {return aOfRLDs;}}
+  LDs RLDs(LDs ahOfRLDs0) : {Dec d; LDs aOfRLDs1;} 
+                                {";" d=D() aOfRLDs1=RLDs(as.cCompuesta(ahOfRLDs0,d)) 
+                                  {return aOfRLDs1;}| 
+                                  {return ahOfRLDs0;} }
+
+  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}
+                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);|
+                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}
+
+  E E0()   : {E aOfE1,aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
+
+  E RE0(E ahOfRE0)  : {E aOfRE0;} 
+                            {"+" aOfE0=E0() aOfRE0=mkexp(MAS,ahOfRE0,aOfE0) {return aOfRE0;}| 
+                             "-" aOfE0=E1() aOfRE0=mkexp(MENOS,ahOfRE0,aOfE0) {return aOfRE0;}|
+                                   {return ahOfRE0;} }
+
+
+  E E1()   : {E aOfE2,aOfRE1;} {aOfE2=E2() aOfRE1=RE1(aOfE2) {return aOfRE1;}}
+  E RE1(E ahOfRE1)  : {int op1; E aOfE2; E aOfRE1;} 
+                            {op1=OP1() aOfE2=E2() aOfRE1=RE1(mkexp(op1,ahOfRE1,aOfE2)) 
+                                  {return aOfRE1;}| 
+                                   {return ahOfRE1;} }
+  E E2()   : {E aOfE3,aOfRE2;} {aOfE3=E3() aOfRE2=RE2(aOfE1) {return aOfRE2;}}
+  E RE2(E ahOfRE2)  : {int op2; E aOfE3; E aOfRE2;} 
+                            {op2=OP2() aOfE3=E3() aOfRE2=RE2(mkexp(op2,ahOfRE2,aOfE3)) 
+                                  {return aOfRE3;}| 
+                                   {return ahOfRE3;} }
+  E E3()   : {E aOfE4,aOfRE3;} {aOfE4=E4() aOfRE3=RE3(aOfE4) {return aOfRE3;}}
+  E RE3(E ahOfRE3)  : {int op3; E aOfE4;} 
+                            {op3=OP3() aOfE4=E4() {mkexp(op0,ahOfRE3,aOfE4) ;}| 
+                                {return ahOfRE3;} }
+
+  E E4()   : {E aOfE5;}{"-" aOfE5 = E5(){return as.negacion(aOfE5);}|
+                        "Not" aOfE5 = E5(){return as.not(aOfE5);}|
+                        {return E5();}}
+                                
+  E E5()   : {Token t; E aOfE0;} 
+                  {t=<numeroEntero> {return as.entero(t.image);} | 
+                  t=<numeroReal> {return as.real(t.image);}| 
+                  t=<identificador> {return as.var(t.image);} |
+                  t=<trueFalse> {return as.trueFalse(t.image);} |
+                  "(" aOfE0=E0() ")" {return aOfE0;}} 
+
+  int OP1()  : {} {"and" {return AND;}| "or" {return OR;}}
+  int OP2()  : {} {"==" {return EQ;}| "!=" {return NE;}|  ">" {return GT;}| ">=" {return GE;} | "<" {return LT;} | "<=" {return LE;}}
+  int OP3()  : {} {"*" {return POR;}| "/" {return DIV;}}

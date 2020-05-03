@@ -8,6 +8,6 @@ public class Or extends EBin {
 
     public String toString()
     {
-      return "{"+this.opnd1().toString() +" Or "+this.opnd2().toString()+"}";
+      return "("+this.opnd1().toString() +" Or "+this.opnd2().toString()+")";
     }
  }

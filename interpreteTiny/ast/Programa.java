@@ -11,9 +11,4 @@ public class Programa extends Prog{
     public LIs exp() {return insts;}
     public LDs decs() {return decs;}
     public TipoProg tipo(){return TipoProg.PROGRAMA;} 
-
-    public String toString()
-    {
-        return this.decs.toString() + "\n"+this.insts.toString();
-    }
 }

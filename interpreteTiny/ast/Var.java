@@ -9,6 +9,6 @@ public class Var extends E {
     public TipoE tipo() {return TipoE.VAR;}     
     public String toString()
     {
-      return "{"+this.var.toString() +"}";
+      return "("+this.var.toString() +")";
     }
   }

@@ -14,6 +14,6 @@ public class DCompuesta extends LDs {
 
    public String toString()
    {
-     return "{"+this.dec.toString() +", "+this.decs.toString()+"}";
+     return "("+this.dec.toString() +", "+this.decs.toString()+")";
    }
 }

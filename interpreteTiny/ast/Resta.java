@@ -7,6 +7,6 @@ public class Resta extends EBin {
    public TipoE tipo() {return TipoE.RESTA;}
    public String toString()
    {
-     return "{"+this.opnd1().toString() +" - "+this.opnd2().toString()+"}";
+     return "("+this.opnd1().toString() +" - "+this.opnd2().toString()+")";
    }
 }

@@ -12,7 +12,7 @@ public class LSimple  extends LIs {
 
     public String toString()
     {
-      return "{"+this.inst.toString()+"}";
+      return "("+this.inst.toString()+")";
     }
  }
  

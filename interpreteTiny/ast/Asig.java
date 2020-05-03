@@ -14,7 +14,7 @@ public class Asig  extends Inst {
 
     public String toString()
     {
-      return "{"+this.var.toString()+ " Asig "+ this.exp.toString()+"}";
+      return "("+this.var.toString()+ " = "+ this.exp.toString()+")";
     }
  }
  

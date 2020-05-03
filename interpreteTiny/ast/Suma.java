@@ -7,6 +7,6 @@ public class Suma extends EBin {
    public TipoE tipo() {return TipoE.SUMA;}
    public String toString()
    {
-     return "{"+this.opnd1().toString() +" + "+this.opnd2().toString()+"}";
+     return "("+this.opnd1().toString() +" + "+this.opnd2().toString()+")";
    }
 }

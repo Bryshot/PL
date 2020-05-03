@@ -15,9 +15,11 @@ public class ASTiny {//Poner todas las constructoras
   public E ge(E opnd1, E opnd2) {return new Ge(opnd1,opnd2);}   
   public E gt(E opnd1, E opnd2) {return new Gt(opnd1,opnd2);}   
 
-  public E neg(E opnd1) {return new Neg(opnd1);}  
-  
-  public E num(String num) {return new Num(num);}  
+  public E not(E opnd1) {return new Not(opnd1);}  
+  public E negacion(E opnd1) {return new Negacion(opnd1);}
+
+  public E entero(String num) {return new Entero(num);}  
+  public E real(String num) {return new Real(num);}  
   public E var(String var) {return new Var(var);}  
   public E trueFalse(String trueFalse) {return new TrueFalse(trueFalse);} 
 
