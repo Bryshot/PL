@@ -56,7 +56,7 @@ PARSER_END(ConstructorASTCore)
   
   Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
 
-  Prog Programa() : {LDs aOfLDs,LIs aOfLIs} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs)}}
+  Prog Programa() : {LDs aOfLDs,LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs);}}
  
   LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.LSimple(d)) 
                        {return aOfRLIs;}}
