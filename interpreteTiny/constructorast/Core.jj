@@ -20,7 +20,7 @@ public class ConstructorASTCore {
    private final static int GE=9;
    private final static int LT=10;
    private final static int LE=11;
-   private E mkexp(int op, E opnd1, E opnd2){
+   public E mkexp(int op, E opnd1, E opnd2){
      switch(op) {
       case MAS: return as.suma(opnd1,opnd2);
       case MENOS: return as.resta(opnd1,opnd2);
@@ -49,6 +49,9 @@ PARSER_END(ConstructorASTCore)
   TOKEN: {<trueFalse:"true"|"false">}
   TOKEN: {<Boolean:"Boolean">}
   TOKEN: {<Int:"Int">}
+  TOKEN: {<And:"And">}
+  TOKEN: {<Or:"Or">}
+  TOKEN: {<Not:"Not">}
   TOKEN: {<Real:"Real">}
   TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
   TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
@@ -56,47 +59,47 @@ PARSER_END(ConstructorASTCore)
   
   Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
 
-  Prog Programa() : {LDs aOfLDs,LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs);}}
+  Prog Programa() : {LDs aOfLDs;LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.programa(aOfLDs,aOfLIs);}}
  
-  LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.LSimple(d)) 
+  LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.lSimple(d)) 
                        {return aOfRLIs;}}
   LIs RLIs(LIs ahOfRLIs0) : {Inst d; LIs aOfRLIs1;} 
-                                {";" d=I() aOfRLIs1=RLIs(as.LCompuesta(ahOfRLIs0,d)) 
+                                {";" d=I() aOfRLIs1=RLIs(as.lCompuesta(ahOfRLIs0,d)) 
                                   {return aOfRLIs1;}| 
                                   {return ahOfRLIs0;} }
  
   Inst I()    : {Token id;} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
 
-  LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.cSimple(d)) 
+  LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.dSimple(d)) 
                        {return aOfRLDs;}}
   LDs RLDs(LDs ahOfRLDs0) : {Dec d; LDs aOfRLDs1;} 
-                                {";" d=D() aOfRLDs1=RLDs(as.cCompuesta(ahOfRLDs0,d)) 
+                                {";" d=D() aOfRLDs1=RLDs(as.dCompuesta(ahOfRLDs0,d)) 
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
-  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}
-                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);|
-                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}
+  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}|
+                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);}|
+                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}}
 
-  E E0()   : {E aOfE1,aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
+  E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
   E RE0(E ahOfRE0)  : {E aOfRE0;} 
-                            {"+" aOfE0=E0() aOfRE0=mkexp(MAS,ahOfRE0,aOfE0) {return aOfRE0;}| 
-                             "-" aOfE0=E1() aOfRE0=mkexp(MENOS,ahOfRE0,aOfE0) {return aOfRE0;}|
+                            {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0)}| 
+                             "-" aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
 
 
-  E E1()   : {E aOfE2,aOfRE1;} {aOfE2=E2() aOfRE1=RE1(aOfE2) {return aOfRE1;}}
+  E E1()   : {E aOfE2; E aOfRE1;} {aOfE2=E2() aOfRE1=RE1(aOfE2) {return aOfRE1;}}
   E RE1(E ahOfRE1)  : {int op1; E aOfE2; E aOfRE1;} 
                             {op1=OP1() aOfE2=E2() aOfRE1=RE1(mkexp(op1,ahOfRE1,aOfE2)) 
                                   {return aOfRE1;}| 
                                    {return ahOfRE1;} }
-  E E2()   : {E aOfE3,aOfRE2;} {aOfE3=E3() aOfRE2=RE2(aOfE1) {return aOfRE2;}}
+  E E2()   : {E aOfE3;E aOfRE2;} {aOfE3=E3() aOfRE2=RE2(aOfE1) {return aOfRE2;}}
   E RE2(E ahOfRE2)  : {int op2; E aOfE3; E aOfRE2;} 
                             {op2=OP2() aOfE3=E3() aOfRE2=RE2(mkexp(op2,ahOfRE2,aOfE3)) 
                                   {return aOfRE3;}| 
                                    {return ahOfRE3;} }
-  E E3()   : {E aOfE4,aOfRE3;} {aOfE4=E4() aOfRE3=RE3(aOfE4) {return aOfRE3;}}
+  E E3()   : {E aOfE4; E aOfRE3;} {aOfE4=E4() aOfRE3=RE3(aOfE4) {return aOfRE3;}}
   E RE3(E ahOfRE3)  : {int op3; E aOfE4;} 
                             {op3=OP3() aOfE4=E4() {mkexp(op0,ahOfRE3,aOfE4) ;}| 
                                 {return ahOfRE3;} }
@@ -112,6 +115,6 @@ PARSER_END(ConstructorASTCore)
                   t=<trueFalse> {return as.trueFalse(t.image);} |
                   "(" aOfE0=E0() ")" {return aOfE0;}} 
 
-  int OP1()  : {} {"and" {return AND;}| "or" {return OR;}}
+  int OP1()  : {} {"And" {return AND;}| "Or" {return OR;}}
   int OP2()  : {} {"==" {return EQ;}| "!=" {return NE;}|  ">" {return GT;}| ">=" {return GE;} | "<" {return LT;} | "<=" {return LE;}}
   int OP3()  : {} {"*" {return POR;}| "/" {return DIV;}}
