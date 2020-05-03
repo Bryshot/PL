@@ -56,7 +56,7 @@ PARSER_END(ConstructorASTCore)
   
   Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
 
-  Prog Programa() : {LDs aOfLDs,LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs);}}
+  Prog Programa() : {LDs aOfLDs;LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.Programa(aOfLDs,aOfLIs);}}
  
   LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.LSimple(d)) 
                        {return aOfRLIs;}}
@@ -74,15 +74,15 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
-  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}
-                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);|
-                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}
+  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);} |
+                            id=<Int> aOfE0=E0(){return as.decInt(aOfE0);} |
+                            id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}}
 
   E E0()   : {E aOfE1,aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
   E RE0(E ahOfRE0)  : {E aOfRE0;} 
-                            {"+" aOfE0=E0() aOfRE0=mkexp(MAS,ahOfRE0,aOfE0) {return aOfRE0;}| 
-                             "-" aOfE0=E1() aOfRE0=mkexp(MENOS,ahOfRE0,aOfE0) {return aOfRE0;}|
+                            {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0) ;}| 
+                             "-" aOfE0=E1() {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
 
 
