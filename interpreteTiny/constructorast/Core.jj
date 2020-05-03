@@ -73,8 +73,6 @@ PARSER_END(ConstructorASTCore)
   TOKEN: {<Int:"int">}
   TOKEN: {<Real:"real">}
   TOKEN:{<identificador:<Letra>(<CaracterValido>)*>}
-  TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
-  TOKEN:{<numeroReal: (["+","-"])? <parteEntera> "." <parteDecimal> >  }
   
   Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
 
@@ -87,7 +85,7 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLIs1;}| 
                                   {return ahOfRLIs0;} }
  
-  Inst I()    : {Token id;tokent;E aOfE0;} {id=<identificador> t=<Asig> aOfE0=E0(){return as.asig(id.image,aOfE0);}}
+  Inst I()    : {Token id;Token t;E aOfE0;} {id=<identificador> t=<Asig> aOfE0=E0(){return as.asig(id.image,aOfE0);}}
 
   LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.dSimple(d)) 
                        {return aOfRLDs;}}
@@ -102,7 +100,7 @@ PARSER_END(ConstructorASTCore)
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
-  E RE0(E ahOfRE0)  : {E aOfE0;Token t} 
+  E RE0(E ahOfRE0)  : {E aOfE0;Token t;} 
                             {t=<Mas> aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0);}| 
                              t=<Menos> aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
@@ -123,17 +121,17 @@ PARSER_END(ConstructorASTCore)
                             {op3=OP3() aOfE4=E4() {mkexp(op3,ahOfRE3,aOfE4) ;}| 
                                 {return ahOfRE3;} }
 
-  E E4()   : {E aOfE5;Token t}{t=<Menos> aOfE5 = E5(){return as.negacion(aOfE5);}|
+  E E4()   : {E aOfE5;Token t;}{t=<Menos> aOfE5 = E5(){return as.negacion(aOfE5);}|
                         t=<Not> aOfE5 = E4(){return as.not(aOfE5);}|
                         {return E5();}}
                                 
   E E5()   : {Token t; E aOfE0;} 
-                  {t=<numeroEntero> {return as.entero(t.image);} | 
-                  t=<numeroReal> {return as.real(t.image);}| 
+                  {t=<NumEnt> {return as.entero(t.image);} | 
+                  t=<NumReal> {return as.real(t.image);}| 
                   t=<identificador> {return as.var(t.image);} |
                   t=<trueFalse> {return as.trueFalse(t.image);} |
                   "(" aOfE0=E0() ")" {return aOfE0;}} 
 
   int OP1()  : {Token t;} {t=<And> {return AND;}| t=<Or> {return OR;}}
-  int OP2()  : {Token t;} {t=<EQ> {return EQ;}| t=<NE> {return NE;}|  t=<GT> {return GT;}| t=<GE> {return GE;} | t=<LT> {return LT;} | t=<LE> {return LE;}}
-  int OP3()  : {} {t=<Por> {return POR;}| t=<Div> {return DIV;}}
+  int OP2()  : {Token t;} {t=<EQ> {return EQ;}| t=<NE> {return NE;}|  t=<GE> {return GE;} | t=<GT> {return GT;}| t=<LT> {return LT;} | t=<LE> {return LE;}}
+  int OP3()  : {Token t;} {t=<Por> {return POR;}| t=<Div> {return DIV;}}
