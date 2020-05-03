@@ -68,7 +68,7 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLIs1;}| 
                                   {return ahOfRLIs0;} }
  
-  Inst I()    : {Token id;} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
+  Inst I()    : {Token id;E aOfE0} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
 
   LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.dSimple(d)) 
                        {return aOfRLDs;}}
@@ -77,13 +77,13 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
-  Dec D()    : {Token id;} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}|
+  Dec D()    : {Token id;E aOfE0} {id=<Real> aOfE0=E0(){return as.decReal(aOfE0);}|
                             id=<Int> aOfE0=E0(){return as.decInt(aOfE0);}|
                             id=<Boolean> aOfE0=E0(){return  as.decBool(aOfE0);}}
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
-  E RE0(E ahOfRE0)  : {E aOfRE0;} 
+  E RE0(E ahOfRE0)  : {E aOfE0;} 
                             {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0)}| 
                              "-" aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
@@ -94,14 +94,14 @@ PARSER_END(ConstructorASTCore)
                             {op1=OP1() aOfE2=E2() aOfRE1=RE1(mkexp(op1,ahOfRE1,aOfE2)) 
                                   {return aOfRE1;}| 
                                    {return ahOfRE1;} }
-  E E2()   : {E aOfE3;E aOfRE2;} {aOfE3=E3() aOfRE2=RE2(aOfE1) {return aOfRE2;}}
+  E E2()   : {E aOfE3;E aOfRE2;} {aOfE3=E3() aOfRE2=RE2(aOfE3) {return aOfRE2;}}
   E RE2(E ahOfRE2)  : {int op2; E aOfE3; E aOfRE2;} 
                             {op2=OP2() aOfE3=E3() aOfRE2=RE2(mkexp(op2,ahOfRE2,aOfE3)) 
-                                  {return aOfRE3;}| 
-                                   {return ahOfRE3;} }
+                                  {return aOfRE2;}| 
+                                   {return ahOfRE2;} }
   E E3()   : {E aOfE4; E aOfRE3;} {aOfE4=E4() aOfRE3=RE3(aOfE4) {return aOfRE3;}}
   E RE3(E ahOfRE3)  : {int op3; E aOfE4;} 
-                            {op3=OP3() aOfE4=E4() {mkexp(op0,ahOfRE3,aOfE4) ;}| 
+                            {op3=OP3() aOfE4=E4() {mkexp(op3,ahOfRE3,aOfE4) ;}| 
                                 {return ahOfRE3;} }
 
   E E4()   : {E aOfE5;}{"-" aOfE5 = E5(){return as.negacion(aOfE5);}|

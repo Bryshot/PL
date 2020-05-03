@@ -47,13 +47,13 @@ public class ConstructorASTCore implements ConstructorASTCoreConstants {
     aOfLDs = LDec();
     jj_consume_token(15);
     aOfLIs = LInst();
-{if ("" != null) return as.Programa(aOfLDs,aOfLIs);}
+{if ("" != null) return as.programa(aOfLDs,aOfLIs);}
     throw new Error("Missing return statement in function");
   }
 
   final public LIs LInst() throws ParseException {Inst d; LIs aOfRLIs;
     d = I();
-    aOfRLIs = RLIs(as.LSimple(d));
+    aOfRLIs = RLIs(as.lSimple(d));
 {if ("" != null) return aOfRLIs;}
     throw new Error("Missing return statement in function");
   }
@@ -63,7 +63,7 @@ public class ConstructorASTCore implements ConstructorASTCoreConstants {
     case 16:{
       jj_consume_token(16);
       d = I();
-      aOfRLIs1 = RLIs(as.LCompuesta(ahOfRLIs0,d));
+      aOfRLIs1 = RLIs(as.lCompuesta(ahOfRLIs0,d));
 {if ("" != null) return aOfRLIs1;}
       break;
       }
