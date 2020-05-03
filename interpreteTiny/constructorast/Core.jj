@@ -49,7 +49,7 @@ PARSER_END(ConstructorASTCore)
   TOKEN: {<trueFalse:"true"|"false">}
   TOKEN: {<Bool:"bool">}
   TOKEN: {<Int:"int">}
-  TOKEN: {<real:"real">}
+  TOKEN: {<Real:"real">}
   TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
   TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
   TOKEN:{<numeroReal: (["+","-"])? <parteEntera> "." <parteDecimal> >  }
@@ -112,6 +112,6 @@ PARSER_END(ConstructorASTCore)
                   t=<trueFalse> {return as.trueFalse(t.image);} |
                   "(" aOfE0=E0() ")" {return aOfE0;}} 
 
-  int OP1()  : {} {"And" {return AND;}| "Or" {return OR;}}
+  int OP1()  : {} {"and" {return AND;}| "or" {return OR;}}
   int OP2()  : {} {"==" {return EQ;}| "!=" {return NE;}|  ">" {return GT;}| ">=" {return GE;} | "<" {return LT;} | "<=" {return LE;}}
   int OP3()  : {} {"*" {return POR;}| "/" {return DIV;}}
