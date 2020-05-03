@@ -39,24 +39,46 @@ public class ConstructorASTCore {
    }
 }
 PARSER_END(ConstructorASTCore)
-  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
-  TOKEN:{<#digitoPositivo:["1"-"9"]>}
-  TOKEN:{<#digito:<digitoPositivo>|"0">} 
-  TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
-  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo>>}
-  SKIP:{<["\t"," ","\r","\b","\n"]>}  
-  SKIP:{<"#"(~["\n"])*>}  
+ TOKEN:{<#Letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#NoCero:["1"-"9"]>}
+  TOKEN:{<#Cero:"0">} 
+  TOKEN:{<#Cifra:<NoCero>|<Cero>>}
+  TOKEN:{<#Punto:".">}
+  TOKEN:{<#CaracterValido: <Cifra> | <Letra> | "_">}
+  TOKEN:{<#ParteReal:<PartePunto> | <ParteExp> | <ParteAmbas>>}
+  TOKEN:{<#ParteAmbas:<PartePunto> <ParteExp>>}
+  TOKEN:{<#PartePunto:<Punto> (<Cifra>)* <NoCero> >}
+  TOKEN:{<#ParteExp:["e", "E"] <NumEnt> >}
+  SKIP:{<["\t"," ","\r","\b","\n"]>}   
+  TOKEN: {<And:"and">}
+  TOKEN: {<Not:"not">}
+  TOKEN: {<Or:"or">}
+  TOKEN: {<EQ:"==">}
+  TOKEN: {<LT:"<">}
+  TOKEN: {<GT:">">}
+  TOKEN: {<GE:">=">}
+  TOKEN: {<LE:"<=">}
+  TOKEN: {<NE:"!=">}
+  TOKEN: {<PComa:";">}
+  TOKEN: {<Separador:"&&">}
+  TOKEN: {<Mas:"+">}
+  TOKEN: {<Menos:"-">}
+  TOKEN: {<Div:"/">}
+  TOKEN: {<Por:"*">}
+  TOKEN: {<Asig:"=">}
+  TOKEN:{<NumEnt: (<Mas> | <Menos>)? (<Cero> | (<NoCero> (<Cifra>)*)) >}
+  TOKEN:{<NumReal:<NumEnt><ParteReal>>}
   TOKEN: {<trueFalse:"true"|"false">}
   TOKEN: {<Bool:"bool">}
   TOKEN: {<Int:"int">}
   TOKEN: {<Real:"real">}
-  TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
+  TOKEN:{<identificador:<Letra>(<CaracterValido>)*>}
   TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
   TOKEN:{<numeroReal: (["+","-"])? <parteEntera> "." <parteDecimal> >  }
   
   Prog Sp()    : {Prog ast;} {ast=Programa() <EOF> {return ast;}}
 
-  Prog Programa() : {LDs aOfLDs;LIs aOfLIs;} {aOfLDs = LDec() "&&" aOfLIs = LInst(){return as.programa(aOfLDs,aOfLIs);}}
+  Prog Programa() : {LDs aOfLDs;LIs aOfLIs;Token t;} {aOfLDs = LDec() t=<Separador> aOfLIs = LInst(){return as.programa(aOfLDs,aOfLIs);}}
  
   LIs LInst()  : {Inst d; LIs aOfRLIs;} {d=I() aOfRLIs=RLIs(as.lSimple(d)) 
                        {return aOfRLIs;}}
@@ -65,12 +87,12 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLIs1;}| 
                                   {return ahOfRLIs0;} }
  
-  Inst I()    : {Token id;E aOfE0;} {id=<identificador> "=" aOfE0=E0(){return as.asig(id.image,aOfE0);}}
+  Inst I()    : {Token id;tokent;E aOfE0;} {id=<identificador> t=<Asig> aOfE0=E0(){return as.asig(id.image,aOfE0);}}
 
   LDs LDec()  : {Dec d; LDs aOfRLDs;} {d=D() aOfRLDs=RLDs(as.dSimple(d)) 
                        {return aOfRLDs;}}
-  LDs RLDs(LDs ahOfRLDs0) : {Dec d; LDs aOfRLDs1;} 
-                                {";" d=D() aOfRLDs1=RLDs(as.dCompuesta(ahOfRLDs0,d)) 
+  LDs RLDs(LDs ahOfRLDs0) : {Dec d; LDs aOfRLDs1;Token t;} 
+                                {t=<PComa> d=D() aOfRLDs1=RLDs(as.dCompuesta(ahOfRLDs0,d)) 
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
@@ -80,9 +102,9 @@ PARSER_END(ConstructorASTCore)
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
-  E RE0(E ahOfRE0)  : {E aOfE0;} 
-                            {"+" aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0);}| 
-                             "-" aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
+  E RE0(E ahOfRE0)  : {E aOfE0;Token t} 
+                            {t=<Mas> aOfE0=E0() {return mkexp(MAS,ahOfRE0,aOfE0);}| 
+                             t=<Menos> aOfE0=E1()  {return mkexp(MENOS,ahOfRE0,aOfE0);}|
                                    {return ahOfRE0;} }
 
 
@@ -101,8 +123,8 @@ PARSER_END(ConstructorASTCore)
                             {op3=OP3() aOfE4=E4() {mkexp(op3,ahOfRE3,aOfE4) ;}| 
                                 {return ahOfRE3;} }
 
-  E E4()   : {E aOfE5;}{"-" aOfE5 = E5(){return as.negacion(aOfE5);}|
-                        "not" aOfE5 = E4(){return as.not(aOfE5);}|
+  E E4()   : {E aOfE5;Token t}{t=<Menos> aOfE5 = E5(){return as.negacion(aOfE5);}|
+                        t=<Not> aOfE5 = E4(){return as.not(aOfE5);}|
                         {return E5();}}
                                 
   E E5()   : {Token t; E aOfE0;} 
@@ -112,6 +134,6 @@ PARSER_END(ConstructorASTCore)
                   t=<trueFalse> {return as.trueFalse(t.image);} |
                   "(" aOfE0=E0() ")" {return aOfE0;}} 
 
-  int OP1()  : {} {"and" {return AND;}| "or" {return OR;}}
-  int OP2()  : {} {"==" {return EQ;}| "!=" {return NE;}|  ">" {return GT;}| ">=" {return GE;} | "<" {return LT;} | "<=" {return LE;}}
-  int OP3()  : {} {"*" {return POR;}| "/" {return DIV;}}
+  int OP1()  : {Token t;} {t=<And> {return AND;}| t=<Or> {return OR;}}
+  int OP2()  : {Token t;} {t=<EQ> {return EQ;}| t=<NE> {return NE;}|  t=<GT> {return GT;}| t=<GE> {return GE;} | t=<LT> {return LT;} | t=<LE> {return LE;}}
+  int OP3()  : {} {t=<Por> {return POR;}| t=<Div> {return DIV;}}
