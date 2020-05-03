@@ -47,11 +47,8 @@ PARSER_END(ConstructorASTCore)
   SKIP:{<["\t"," ","\r","\b","\n"]>}  
   SKIP:{<"#"(~["\n"])*>}  
   TOKEN: {<trueFalse:"true"|"false">}
-  TOKEN: {<bool:"bool">}
-  TOKEN: {<int:"int">}
-  TOKEN: {<And:"And">}
-  TOKEN: {<Or:"Or">}
-  TOKEN: {<Not:"Not">}
+  TOKEN: {<Bool:"bool">}
+  TOKEN: {<Int:"int">}
   TOKEN: {<real:"real">}
   TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
   TOKEN:{<numeroEntero: (["+","-"])? <parteEntera> >}
@@ -77,9 +74,9 @@ PARSER_END(ConstructorASTCore)
                                   {return aOfRLDs1;}| 
                                   {return ahOfRLDs0;} }
 
-  Dec D()    : {Token id;Token t;} {id=<real> t=<identificador>{return as.decReal(t.image);}|
-                            id=<int>  t=<identificador>{return as.decInt(t.image);}|
-                            id=<bool>  t=<identificador>{return  as.decBool(t.image);}}
+  Dec D()    : {Token id;Token t;} {id=<Real> t=<identificador>{return as.decReal(t.image);}|
+                            id=<Int>  t=<identificador>{return as.decInt(t.image);}|
+                            id=<Bool>  t=<identificador>{return  as.decBool(t.image);}}
 
   E E0()   : {E aOfE1; E aOfRE0;} {aOfE1=E1() aOfRE0=RE0(aOfE1) {return aOfRE0;}}
 
@@ -105,7 +102,7 @@ PARSER_END(ConstructorASTCore)
                                 {return ahOfRE3;} }
 
   E E4()   : {E aOfE5;}{"-" aOfE5 = E5(){return as.negacion(aOfE5);}|
-                        "Not" aOfE5 = E4(){return as.not(aOfE5);}|
+                        "not" aOfE5 = E4(){return as.not(aOfE5);}|
                         {return E5();}}
                                 
   E E5()   : {Token t; E aOfE0;} 
