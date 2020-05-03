@@ -1,0 +1,141 @@
+package constructorast;
+
+import java_cup.runtime.*;
+import alex.AnalizadorLexicoCore;
+import alex.UnidadLexica;
+import errors.GestionErroresCore;
+import ast.*;
+
+scan with {: return getScanner().next_token(); :};
+action code {:
+    private ASCore as = new ASCore();
+   
+    private E opBin(Object op, E e1, E e2){
+        switch(op.toString()) {
+            case "*":
+                return as.mul(e1, e2);
+            case "/":
+                return as.div(e1, e2);
+            case "and":
+                return as.and(e1, e2);
+            case "or":
+                return as.or(e1, e2);
+            case "==":
+                return as.eq(e1, e2);
+            case "!=":
+                return as.ne(e1, e2);
+            case "<":
+                return as.lt(e1, e2);
+            case "<=":
+                return as.le(e1, e2);
+            case ">":
+                return as.gt(e1, e2);
+            case ">=":
+                return as.ge(e1, e2);
+            case "+":
+                return as.suma(e1, e2);
+            default:
+                return as.resta(e1, e2);
+        }
+    }
+:};
+parser code {: 
+   private GestionErroresCore errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+init with {: 
+   errores = new GestionErroresCore();
+   AnalizadorLexicoCore alex = (AnalizadorLexicoCore)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+
+terminal     PAPER, PCIE, EQ, LT, LE, GE, GT, NE, PCOMA, SEPARADOR, AND, OR, NOT,
+	MAS, MENOS, POR, DIV, ASIG, FALSE, TRUE, TREAL, TBOOL, TENT;
+terminal String IDEN, ENT, REAL;
+
+non terminal Prog PROG;
+non terminal LDs DECS;
+non terminal Dec DEC;
+non terminal LIs INSTS;
+non terminal Inst INST;
+non terminal E EXPR0, EXPR1, EXPR2, EXPR3, EXPR4, EXPR5;
+non terminal OP1, OP2, OP3;
+
+PROG		::= DECS: aDeDECS SEPARADOR INSTS: aDeINSTS
+                  {: RESULT = as.programa(aDeDECS, aDeINSTS); :};
+DECS		::= DEC: aDeDEC
+                  {: RESULT = as.dSimple(aDeDEC); :} | 
+                DECS: aDeDECS PCOMA DEC: aDeDEC
+                  {: RESULT = as.dCompuesta(aDeDECS, aDeDEC); :};
+DEC			::= TENT IDEN: lexDeIDEN
+                  {: RESULT = as.decInt(lexDeIDEN); :} | 
+                TREAL IDEN: lexDeIDEN
+                  {: RESULT = as.decReal(lexDeIDEN); :} |
+                TBOOL IDEN: lexDeIDEN
+                  {: RESULT = as.decBool(lexDeIDEN); :};
+INSTS		::= INST: aDeINST
+                  {: RESULT = as.lSimple(aDeINST); :} |
+                INSTS: aDeINSTS PCOMA INST: aDeINST
+                  {: RESULT = as.lCompuesta(aDeINSTS, aDeINST); :};
+INST		::= IDEN: lexDeIDEN ASIG EXPR0: aDeEXPR0
+                  {: RESULT = as.asig(lexDeIDEN, aDeEXPR0); :};
+EXPR0		::= EXPR1: aDeEXPR1 MAS EXPR0: aDeEXPR0 
+                  {: RESULT = opBin("+", aDeEXPR1, aDeEXPR0); :} |
+                EXPR1: aDeEXPR10 MENOS EXPR1: aDeEXPR11 
+                  {: RESULT = opBin("-", aDeEXPR10, aDeEXPR11); :} | 
+                EXPR1: aDeEXPR1
+                  {: RESULT = aDeEXPR1; :};
+EXPR1		::= EXPR1: aDeEXPR1 OP1: opDeOP1 EXPR2: aDeEXPR2
+                  {: RESULT = opBin(opDeOP1, aDeEXPR1, aDeEXPR2); :} |
+                EXPR2: aDeEXPR2
+                  {: RESULT = aDeEXPR2; :};
+EXPR2		::= EXPR2: aDeEXPR2 OP2: opDeOP2 EXPR3: aDeEXPR3 
+                  {: RESULT =  opBin(opDeOP2, aDeEXPR2, aDeEXPR3); :} |
+                EXPR3: aDeEXPR3
+                  {: RESULT = aDeEXPR3; :};
+EXPR3		::= EXPR4: aDeEXPR40 OP3: opDeOP3 EXPR4: aDeEXPR41
+                  {: RESULT = opBin(opDeOP3, aDeEXPR40, aDeEXPR41); :} |
+                EXPR4: aDeEXPR4
+                  {: RESULT = aDeEXPR4; :};
+EXPR4		::= MENOS EXPR5: aDeEXPR5
+                  {: RESULT = as.negacion(aDeEXPR5); :} | 
+                NOT EXPR4: aDeEXPR4
+                  {: RESULT = as.not(aDeEXPR4); :}|
+                EXPR5: aDeEXPR5
+                  {: RESULT = aDeEXPR5; :};
+EXPR5		::= PAPER EXPR0: aDeEXPR0 PCIE 
+                  {: RESULT = aDeEXPR0; :} | 
+                IDEN: lexDeIDEN
+                  {: RESULT = as.var(lexDeIDEN); :} |
+                TRUE
+                  {: RESULT = as.trueFalse("true"); :} |
+                FALSE 
+                  {: RESULT = as.trueFalse("false"); :} | 
+                ENT: lexDeENT 
+                  {: RESULT = as.entero(lexDeENT); :} | 
+                REAL: lexDeREAL
+                  {: RESULT = as.real(lexDeREAL); :};
+OP1			::= AND
+                  {: RESULT = "and"; :} |
+                OR
+                  {: RESULT = "or"; :};
+OP2			::= EQ 
+                  {: RESULT = "=="; :} |
+                NE 
+                  {: RESULT = "!="; :} |
+                GT 
+                  {: RESULT = ">"; :} |
+                GE 
+                  {: RESULT = ">="; :} |
+                LT 
+                  {: RESULT = "<"; :} |
+                LE 
+                  {: RESULT = "<="; :};
+OP3			::= POR  
+                  {: RESULT = "*"; :} |
+                DIV 
+                  {: RESULT = "/"; :};
+
+

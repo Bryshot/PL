@@ -1,0 +1,7 @@
+
+bool mal;
+real error;
+int fallo
+&&
+mal = not not true;
+fallo = - - (1) + 16
