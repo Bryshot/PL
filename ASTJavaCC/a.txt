@@ -1,0 +1,6 @@
+bool enc;
+int test
+&&
+enc = a + 3;
+test = ((7 * 14) and true)
+

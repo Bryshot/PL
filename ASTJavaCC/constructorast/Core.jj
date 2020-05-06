@@ -1,0 +1,208 @@
+options  {
+  STATIC=false;
+}  
+PARSER_BEGIN(ConstructorASTCore)
+package constructorast;
+
+import ast.*;
+
+public class ConstructorASTCore {
+   private ASCore as = new ASCore();
+   private final static int MAS=0;
+   private final static int MENOS=1;
+   private final static int POR=2;
+   private final static int DIV=3;
+   private final static int AND=4;
+   private final static int OR=5;
+   private final static int EQ=6;
+   private final static int NE=7;
+   private final static int GT=8;
+   private final static int GE=9;
+   private final static int LT=10;
+   private final static int LE=11;
+   public E mkexp(int op, E opnd1, E opnd2){
+     switch(op) {
+      case MAS: return as.suma(opnd1,opnd2);
+      case MENOS: return as.resta(opnd1,opnd2);
+      case POR: return as.mul(opnd1,opnd2);
+      case DIV: return as.div(opnd1,opnd2);
+      case AND: return as.and(opnd1,opnd2);
+      case OR: return as.or(opnd1,opnd2);
+      case EQ: return as.eq(opnd1,opnd2);
+      case NE: return as.ne(opnd1,opnd2);
+      case GT: return as.gt(opnd1,opnd2);
+      case GE: return as.ge(opnd1,opnd2);
+      case LT: return as.lt(opnd1,opnd2);
+      case LE: return as.le(opnd1,opnd2);
+      default: return null;
+     }
+   }
+}
+PARSER_END(ConstructorASTCore)
+  TOKEN:{<#Letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#NoCero:["1"-"9"]>}
+  TOKEN:{<#Cero:"0">} 
+  TOKEN:{<#Cifra:<NoCero>|<Cero>>}
+  TOKEN:{<#Punto:".">}
+  TOKEN:{<#CaracterValido: <Cifra> | <Letra> | "_">}
+  TOKEN:{<#ParteReal:<PartePunto> | <ParteExp> | <ParteAmbas>>}
+  TOKEN:{<#ParteAmbas:<PartePunto> <ParteExp>>}
+  TOKEN:{<#PartePunto:<Punto> (<Cifra>)* <NoCero> >}
+  TOKEN:{<#ParteExp:["e", "E"] <NumEnt> >}
+  SKIP:{<["\t"," ","\r","\b","\n"]>}
+  TOKEN: {<TEnt:"int">}
+  TOKEN: {<TReal:"real">}
+  TOKEN: {<TBool:"bool">}
+  TOKEN: {<And:"and">}
+  TOKEN: {<Not:"not">}
+  TOKEN: {<Or:"or">}
+  TOKEN: {<True:"true">}
+  TOKEN: {<False:"false">}
+  TOKEN: {<PAper:"(">}
+  TOKEN: {<PCie:")">}
+  TOKEN: {<EQ:"==">}
+  TOKEN: {<LT:"<">}
+  TOKEN: {<GT:">">}
+  TOKEN: {<GE:">=">}
+  TOKEN: {<LE:"<=">}
+  TOKEN: {<NE:"!=">}
+  TOKEN: {<PComa:";">}
+  TOKEN: {<Separador:"&&">}
+  TOKEN: {<Mas:"+">}
+  TOKEN: {<Menos:"-">}
+  TOKEN: {<Div:"/">}
+  TOKEN: {<Por:"*">}
+  TOKEN: {<Asig:"=">}
+  TOKEN:{<NombreVariable:<Letra>(<CaracterValido>)*>}
+  TOKEN:{<NumEnt: (<Mas> | <Menos>)? (<Cero> | (<NoCero> (<Cifra>)*)) >}
+  TOKEN:{<NumReal:<NumEnt><ParteReal>>}
+  
+  Prog Sp()               : { Prog ast; }
+                            { ast = Programa() <EOF> 
+                              { System.out.println(ast.toString()); return ast; } }
+
+  Prog Programa()         : { LDs aDeLDs; LIs aDeLIs; }
+                            { aDeLDs = LDec() <Separador> aDeLIs = LInst()
+                              { return as.programa(aDeLDs, aDeLIs); } }
+
+  LDs LDec()              : { Dec aDeDec; LDs aDeRLDs; }
+                            { aDeDec = D() aDeRLDs = RLDs(as.dSimple(aDeDec)) 
+                              { return aDeRLDs; } }
+                       
+  LDs RLDs(LDs ahDeRLDs0) : { Dec aDeDec; LDs aDeRLDs1; } 
+                            { <PComa> aDeDec = D() aDeRLDs1 = RLDs(as.dCompuesta(ahDeRLDs0, aDeDec)) 
+                              { return aDeRLDs1; } | 
+                              {}
+                              { return ahDeRLDs0; } }
+
+  Dec D()                 : { Token tipo; Token id; }
+                            { tipo = <TReal> id = <NombreVariable> 
+                              { return as.decReal(id.image); } |
+                              tipo = <TEnt> id = <NombreVariable>
+                              { return as.decInt(id.image); } |
+                              tipo = <TBool> id = <NombreVariable>
+                              { return as.decBool(id.image); } }
+ 
+  LIs LInst()             : { Inst aDeInst; LIs aDeRLIs; }
+                            { aDeInst = I() aDeRLIs = RLIs(as.lSimple(aDeInst)) 
+                              { return aDeRLIs; } }
+                       
+  LIs RLIs(LIs ahDeRLIs0) : { Inst aDeInst; LIs aDeRLIs1; } 
+                            { <PComa> aDeInst = I() aDeRLIs1 = RLIs(as.lCompuesta(ahDeRLIs0, aDeInst)) 
+                              { return aDeRLIs1; } | 
+                              {}
+                              { return ahDeRLIs0; } }
+ 
+  Inst I()                : { Token id; E aDeE0; }
+                            { id = <NombreVariable> <Asig> aDeE0 = E0()
+                              { return as.asig(id.image, aDeE0); } }
+
+  E E0()                  : { E aDeE1; E aDeRE0; } 
+                            { aDeE1 = E1() aDeRE0 = RE0(aDeE1) 
+                              { return aDeRE0; } }
+
+  E RE0(E ahDeRE0)        : { E aDeE; } 
+                            { <Mas> aDeE = E0() 
+                              { return mkexp(MAS, ahDeRE0, aDeE); } | 
+                              <Menos> aDeE = E1() 
+                              { return mkexp(MENOS, ahDeRE0, aDeE); } |
+                              {}
+                              { return ahDeRE0; } }
+
+  E E1()                  : { E aDeE2; E aDeRE1; }
+                              { aDeE2 = E2() aDeRE1 = RE1(aDeE2)
+                              { return aDeRE1; } }
+                              
+  E RE1(E ahDeRE1)        : { int op1; E aDeE2; E aDeRE1; } 
+                            { op1 = OP1() aDeE2 = E2() aDeRE1 = RE1(mkexp(op1, ahDeRE1, aDeE2)) 
+                              { return aDeRE1; } | 
+                              {}
+                              { return ahDeRE1; } }
+                              
+  E E2()                  : { E aDeE3; E aDeRE2; }
+                              { aDeE3 = E3() aDeRE2 = RE2(aDeE3)
+                              { return aDeRE2; } }
+                              
+  E RE2(E ahDeRE2)        : { int op2; E aDeE3; E aDeRE2; } 
+                              { op2 = OP2() aDeE3 = E3() aDeRE2 = RE2(mkexp(op2, ahDeRE2, aDeE3)) 
+                              { return aDeRE2; } | 
+                              {}
+                              { return ahDeRE2; } }
+                              
+  E E3()                  : { E aDeE4; E aDeRE3; }
+                              { aDeE4 = E4() aDeRE3 = RE3(aDeE4)
+                              { return aDeRE3; } }
+                              
+  E RE3(E ahDeRE3)        : { int op3; E aDeE4; } 
+                            { op3 = OP3() aDeE4 = E4()
+                              { return mkexp(op3, ahDeRE3, aDeE4); } |
+                              {} 
+                              { return ahDeRE3; } }
+
+  E E4()                  : { E aDeE; }
+                            { <Menos> aDeE = E5()
+                              { return as.negacion(aDeE); } |
+                              <Not> aDeE = E4()
+                              { return as.not(aDeE); } |
+                              aDeE = E5()
+                              { return aDeE; } }
+                                
+  E E5()                  : { Token t; E aDeE0; } 
+                            { t = <NumEnt>
+                              { return as.entero(t.image); } | 
+                              t = <NumReal>
+                              { return as.real(t.image); } |
+                              t = <True>
+                              { return as.trueFalse(t.image); } |
+                              t = <False>
+                              { return as.trueFalse(t.image); } |
+                              t = <NombreVariable>
+                              { return as.var(t.image); } |
+                              <PAper> aDeE0 = E0() <PCie>
+                              { return aDeE0; } } 
+
+  int OP1()               : {}
+                            { <And>
+                              { return AND; } |
+                              <Or>
+                              { return OR; } }
+                              
+  int OP2()               : {}
+                            { <EQ>
+                              { return EQ; } |
+                              <NE>
+                              { return NE; } |
+                              <GT>
+                              { return GT; } |
+                              <GE>
+                              { return GE; } |
+                              <LT>
+                              { return LT; } |
+                              <LE>
+                              { return LE; } }
+                              
+  int OP3()               : {}
+                            { <Por>
+                              { return POR; } |
+                              <Div>
+                              { return DIV; } }
